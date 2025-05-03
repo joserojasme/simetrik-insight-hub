@@ -93,7 +93,7 @@ const UpSellPage = () => {
 
       {selectedCustomer && (
         <Dialog open={!!selectedCustomer} onOpenChange={() => setSelectedCustomer(null)}>
-          <DialogContent className="max-w-4xl">
+          <DialogContent className="max-w-4xl overflow-y-auto">
             <h2 className="text-2xl font-bold mb-4">{selectedCustomer.name}</h2>
             <p className="text-gray-500 mb-6">{selectedCustomer.company}</p>
             <CustomerDetails customer={selectedCustomer} type="upsell" />
