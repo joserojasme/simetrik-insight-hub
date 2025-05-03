@@ -25,7 +25,7 @@ const StatusCircle: React.FC<StatusCircleProps> = ({
   pulsing = false,
 }) => {
   const isChurn = title.toLowerCase().includes('churn');
-  const trendIcon = isChurn ? TrendingDown : TrendingUp;
+  const IconComponent = isChurn ? TrendingDown : TrendingUp;
   const trendColor = isChurn ? "text-danger" : "text-success";
   
   return (
@@ -48,7 +48,7 @@ const StatusCircle: React.FC<StatusCircleProps> = ({
                 </div>
                 <div className="text-3xl font-bold text-gray-800">{percentage}%</div>
                 <div className="flex items-center justify-center text-base mt-2">
-                  <trendIcon className={cn("h-5 w-5 mr-1", trendColor)} />
+                  <IconComponent className={cn("h-5 w-5 mr-1", trendColor)} />
                   <span className={trendColor}>{title}</span>
                 </div>
               </div>

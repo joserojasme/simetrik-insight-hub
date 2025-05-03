@@ -6,9 +6,16 @@ const Header = () => {
   return (
     <header className="border-b border-gray-200 bg-white">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <div className="flex items-center">
+        <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center">
+            <img 
+              src="https://www.simetrik.com/images/logo.svg" 
+              alt="Simetrik Logo" 
+              className="h-8"
+            />
+          </Link>
           <h1 className="text-xl font-bold text-primary">
-            <Link to="/">Simetrik Insight Hub</Link>
+            <Link to="/">Insight Hub</Link>
           </h1>
         </div>
         <nav className="hidden md:block">
