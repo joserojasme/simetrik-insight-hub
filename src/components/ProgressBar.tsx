@@ -8,6 +8,7 @@ interface ProgressBarProps {
   colorClass?: string;
   height?: string;
   showText?: boolean;
+  animated?: boolean;
 }
 
 const ProgressBar: React.FC<ProgressBarProps> = ({
@@ -15,7 +16,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   max = 100,
   colorClass = "bg-primary",
   height = "h-2",
-  showText = false
+  showText = false,
+  animated = false
 }) => {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
   
@@ -23,7 +25,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     <div className="w-full">
       <div className="relative w-full bg-gray-200 rounded-full overflow-hidden shadow-inner">
         <div 
-          className={cn("transition-all duration-500 ease-out rounded-full", colorClass, height)} 
+          className={cn(
+            "transition-all duration-500 ease-out rounded-full", 
+            colorClass, 
+            height,
+            animated && "animate-pulse-light"
+          )} 
           style={{ width: `${percentage}%` }}
         />
       </div>

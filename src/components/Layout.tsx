@@ -14,8 +14,13 @@ const Layout = ({ children }: LayoutProps) => {
         {children}
       </main>
       <footer className="border-t border-gray-200 bg-white py-4">
-        <div className="container mx-auto px-4 text-center text-sm text-gray-500">
-          © {new Date().getFullYear()} Simetrik Insight Hub
+        <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
+          <div>© {new Date().getFullYear()} Simetrik Insight Hub</div>
+          <div className="mt-2 md:mt-0 flex gap-4">
+            <a href="#" className="hover:text-primary">Documentation</a>
+            <a href="#" className="hover:text-primary">Support</a>
+            <a href="#" className="hover:text-primary">Privacy Policy</a>
+          </div>
         </div>
       </footer>
     </div>

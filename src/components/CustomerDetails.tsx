@@ -4,6 +4,8 @@ import { Customer } from '@/data/mockData';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ProgressBar from './ProgressBar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Phone, Mail, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface CustomerDetailsProps {
   customer: Customer;
@@ -18,6 +20,18 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, type }) => 
     } else {
       return score >= 80 ? "bg-success" : score >= 50 ? "bg-warning" : "bg-danger";
     }
+  };
+
+  const getTrendIndicator = (value: string | number, isPositive: boolean) => {
+    // For churn, negative trends are bad, for upsell positive trends are good
+    const isGood = type === 'churn' ? !isPositive : isPositive;
+    
+    return (
+      <span className={`flex items-center ${isGood ? 'text-success' : 'text-danger'} text-xs font-medium ml-1`}>
+        {isPositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
+        {value}
+      </span>
+    );
   };
 
   const getAIExplanation = () => {
@@ -88,6 +102,36 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, type }) => 
     return null;
   };
 
+  const getActionButtons = () => {
+    if (type === 'churn') {
+      return (
+        <div className="flex flex-col md:flex-row gap-3 mt-4">
+          <Button variant="destructive" className="flex-1">
+            <Phone className="mr-2 h-4 w-4" />
+            Schedule Retention Call
+          </Button>
+          <Button variant="outline" className="flex-1">
+            <Mail className="mr-2 h-4 w-4" />
+            Send Check-in Email
+          </Button>
+        </div>
+      );
+    } else {
+      return (
+        <div className="flex flex-col md:flex-row gap-3 mt-4">
+          <Button className="flex-1 bg-success hover:bg-success/90">
+            <Phone className="mr-2 h-4 w-4" />
+            Schedule Up-sell Call
+          </Button>
+          <Button variant="outline" className="flex-1 text-success border-success hover:bg-success/10">
+            <Mail className="mr-2 h-4 w-4" />
+            Send Product Update
+          </Button>
+        </div>
+      );
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card>
@@ -107,7 +151,8 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, type }) => 
           <ProgressBar 
             value={score} 
             colorClass={getScoreColor()} 
-            height="h-3" 
+            height="h-3"
+            animated={score >= 80} 
           />
           
           {/* Reasons as badges */}
@@ -125,6 +170,9 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, type }) => 
           
           {/* AI explanation */}
           {getAIExplanation()}
+          
+          {/* Action buttons */}
+          {getActionButtons()}
         </CardContent>
       </Card>
       
@@ -136,15 +184,25 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, type }) => 
           <dl className="grid grid-cols-2 gap-2 text-sm">
             <div className="col-span-2 py-2 border-b border-gray-100">
               <dt className="text-gray-500">Weekly Usage</dt>
-              <dd className="font-medium">{customer.behavior.weeklyUsage} sessions</dd>
+              <dd className="font-medium flex items-center">
+                {customer.behavior.weeklyUsage} sessions
+                {customer.userFlow.usagePatternChanges === 'increasing' && getTrendIndicator('+12%', true)}
+                {customer.userFlow.usagePatternChanges === 'decreasing' && getTrendIndicator('-8%', false)}
+              </dd>
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Avg Session Time</dt>
-              <dd className="font-medium">{customer.behavior.avgSessionTime} minutes</dd>
+              <dd className="font-medium flex items-center">
+                {customer.behavior.avgSessionTime} minutes
+                {customer.behavior.avgSessionTime > 15 && getTrendIndicator('+2min', true)}
+              </dd>
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Reconciliations</dt>
-              <dd className="font-medium">{customer.behavior.reconciliationsCompleted}</dd>
+              <dd className="font-medium flex items-center">
+                {customer.behavior.reconciliationsCompleted}
+                {customer.behavior.reconciliationsCompleted > 50 && getTrendIndicator('+15%', true)}
+              </dd>
             </div>
             <div className="col-span-2 py-2 border-b border-gray-100">
               <dt className="text-gray-500">Key Features</dt>
@@ -158,7 +216,10 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, type }) => 
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">CSM Interaction</dt>
-              <dd className="font-medium">{customer.engagement.csmInteraction}/10</dd>
+              <dd className="font-medium flex items-center">
+                {customer.engagement.csmInteraction}/10
+                {customer.engagement.csmInteraction < 5 && getTrendIndicator('-2', false)}
+              </dd>
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Campaign Participation</dt>
@@ -176,7 +237,10 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, type }) => 
           <dl className="grid grid-cols-2 gap-2 text-sm">
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Open Tickets</dt>
-              <dd className="font-medium">{customer.support.openTickets}</dd>
+              <dd className="font-medium flex items-center">
+                {customer.support.openTickets}
+                {customer.support.openTickets > 0 && getTrendIndicator('+1', false)}
+              </dd>
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Closed Tickets</dt>
@@ -184,7 +248,10 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, type }) => 
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Avg Response Time</dt>
-              <dd className="font-medium">{customer.support.avgResponseTime} hours</dd>
+              <dd className="font-medium flex items-center">
+                {customer.support.avgResponseTime} hours
+                {customer.support.avgResponseTime > 12 && getTrendIndicator('+2h', false)}
+              </dd>
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Repeated Issues</dt>
@@ -214,7 +281,11 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, type }) => 
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Usage Pattern</dt>
-              <dd className="font-medium capitalize">{customer.userFlow.usagePatternChanges}</dd>
+              <dd className="font-medium capitalize flex items-center">
+                {customer.userFlow.usagePatternChanges}
+                {customer.userFlow.usagePatternChanges === 'decreasing' && getTrendIndicator('-15%', false)}
+                {customer.userFlow.usagePatternChanges === 'increasing' && getTrendIndicator('+18%', true)}
+              </dd>
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Core Feature Usage</dt>
@@ -222,15 +293,24 @@ const CustomerDetails: React.FC<CustomerDetailsProps> = ({ customer, type }) => 
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Monthly Transactions</dt>
-              <dd className="font-medium">{customer.additionalData.monthlyTransactionVolume.toLocaleString()}</dd>
+              <dd className="font-medium flex items-center">
+                {customer.additionalData.monthlyTransactionVolume.toLocaleString()}
+                {customer.additionalData.dataGrowthRate > 20 && getTrendIndicator('+22%', true)}
+              </dd>
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">GB Consumed Monthly</dt>
-              <dd className="font-medium">{customer.additionalData.gigasConsumedMonthly}</dd>
+              <dd className="font-medium flex items-center">
+                {customer.additionalData.gigasConsumedMonthly}
+                {customer.additionalData.dataGrowthRate > 15 && getTrendIndicator('+18%', true)}
+              </dd>
             </div>
             <div className="py-2 border-b border-gray-100">
               <dt className="text-gray-500">Data Growth Rate</dt>
-              <dd className="font-medium">{customer.additionalData.dataGrowthRate}%</dd>
+              <dd className="font-medium flex items-center">
+                {customer.additionalData.dataGrowthRate}%
+                {customer.additionalData.dataGrowthRate > 25 && getTrendIndicator('↑', true)}
+              </dd>
             </div>
           </dl>
         </CardContent>

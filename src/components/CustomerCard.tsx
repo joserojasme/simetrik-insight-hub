@@ -3,6 +3,8 @@ import React from 'react';
 import { Customer } from '@/data/mockData';
 import ProgressBar from './ProgressBar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Phone, Mail } from 'lucide-react';
 
 interface CustomerCardProps {
   customer: Customer;
@@ -33,6 +35,44 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customer, type }) => {
     }
   };
 
+  const getActionButton = () => {
+    if (type === 'churn') {
+      if (score >= 70) {
+        return (
+          <Button variant="destructive" className="w-full mt-4" size="sm">
+            <Phone className="mr-2 h-4 w-4" />
+            Schedule Retention Call
+          </Button>
+        );
+      } else if (score >= 40) {
+        return (
+          <Button variant="outline" className="w-full mt-4" size="sm">
+            <Mail className="mr-2 h-4 w-4" />
+            Send Check-in Email
+          </Button>
+        );
+      }
+    } else {
+      if (score >= 70) {
+        return (
+          <Button variant="default" className="w-full mt-4 bg-success" size="sm">
+            <Phone className="mr-2 h-4 w-4" />
+            Schedule Up-sell Call
+          </Button>
+        );
+      } else if (score >= 40) {
+        return (
+          <Button variant="outline" className="w-full mt-4 text-success border-success hover:bg-success/10" size="sm">
+            <Mail className="mr-2 h-4 w-4" />
+            Send Product Update
+          </Button>
+        );
+      }
+    }
+    
+    return null;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
       <div className="flex justify-between items-start mb-4">
@@ -50,6 +90,7 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customer, type }) => {
         value={score} 
         colorClass={getScoreColor()} 
         height="h-2.5" 
+        animated={score >= 80}
       />
       
       <div className="mt-3">
@@ -90,6 +131,8 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ customer, type }) => {
           <span className="font-medium">{customer.engagement.csmInteraction}/10</span>
         </div>
       </div>
+      
+      {getActionButton()}
     </div>
   );
 };
